@@ -16,11 +16,11 @@ router.post('/register', async (req, res) => {
         if (existing.length > 0) {
             return res.status(400).json({message: 'Email or phone already registered'});
         } 
-        const hashedPassword = await bcrypt.hash(password, 10); // Run 2^10 times to hash the password
+        const password_hash = await bcrypt.hash(password, 10); // Run 2^10 times to hash the password
         // await is to wait for the promise to resolve
         const [result] = await pool.query(
             'INSERT INTO User (name, email, phone, password_hash) VALUES (?, ?, ?, ?)',
-            [name, email, phone, hashedPassword],
+            [name, email, phone, password_hash],
         );
 
         // Create a blank preference rows to be later filled by the user
@@ -43,6 +43,7 @@ router.post('/login', async(req, res) => {
         if (user.length === 0) {
             return res.status(404).json({message: "User not found"});
         }
+
         // Check password
             // user is an array, so we need to access the first element
             // user[0].password: the password of the user
@@ -63,6 +64,8 @@ router.post('/login', async(req, res) => {
         res.status(500).json({message: 'Login failed'});
     }      
 });
+
+// Router recipes
 
 
 
